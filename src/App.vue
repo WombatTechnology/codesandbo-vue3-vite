@@ -1,19 +1,45 @@
 <script setup lang="ts">
-import { reactive } from "vue"
-const dragStart = (event: any) => {
-  console.log("dragEvent", event)
+import { reactive, ref } from "vue"
+import { moveIndex } from "./moveIndex"
+const data = reactive({
+  items: [
+    {
+      name: "太郎",
+    },
+    {
+      name: "花子",
+    },
+    {
+      name: "健太",
+    },
+    {
+      name: "愛",
+    },
+  ],
+})
+
+const fromIndex = ref<number | null>(null)
+
+const startDrag = (index: number) => {
+  fromIndex.value = index
 }
 
-const drop = (event: any) => {
-  console.log("dropEvent", event)
+const drop = (index: number) => {
+  if (fromIndex.value === null) return
+  data.items = moveIndex(data.items, fromIndex.value, index)
 }
 </script>
 
 <template>
-  <div class="drop-area" @drop="drop" @dragover.prevent @dragenter.prevent>
-    Drop Me
+  <div v-for="(u, i) in data.items">
+    <div
+      class="drop-area"
+      @drop="() => drop(i)"
+      @dragover.prevent
+      @dragenter.prevent
+    >
+      dropme
+    </div>
+    <span draggable="true" @dragstart="() => startDrag(i)">{{ u.name }}</span>
   </div>
-  <div class="drag-target" draggable="true" @dragstart="dragStart">Drag Me</div>
 </template>
-
-<style scoped></style>
