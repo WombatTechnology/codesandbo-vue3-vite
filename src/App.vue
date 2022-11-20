@@ -18,28 +18,35 @@ const data = reactive({
   ],
 })
 
-const fromIndex = ref<number | null>(null)
-
-const startDrag = (index: number) => {
-  fromIndex.value = index
+const dragFromIndex = ref<number | null>(null)
+const saveFromIndex = (fromIndex: number) => {
+  dragFromIndex.value = fromIndex
 }
 
-const drop = (index: number) => {
-  if (fromIndex.value === null) return
-  data.items = moveIndex(data.items, fromIndex.value, index)
+const moveItem = (targetIndex: number) => {
+  if (dragFromIndex.value === null) return
+  data.items = moveIndex(data.items, dragFromIndex.value, targetIndex)
 }
 </script>
 
 <template>
   <div v-for="(u, i) in data.items">
-    <div
-      class="drop-area"
-      @drop="() => drop(i)"
-      @dragover.prevent
-      @dragenter.prevent
-    >
-      dropme
+    <!-- ドロップ要素 -->
+    <div class="drop-area" @drop="() => moveItem(i)" @dragover.prevent>
+      {{ i }}
     </div>
-    <span draggable="true" @dragstart="() => startDrag(i)">{{ u.name }}</span>
+    <!-- ドラッグ要素 -->
+    <span draggable="true" @dragstart="() => saveFromIndex(i)">{{
+      u.name
+    }}</span>
   </div>
 </template>
+
+<style>
+.drop-area {
+  width: 40px;
+  background-color: gray;
+  height: 20px;
+  color: white;
+}
+</style>
